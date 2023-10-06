@@ -26,6 +26,7 @@ func reverse(arr []uuid.UUID) []uuid.UUID {
 	return invertido
 }
 
+// La struct entity es la instancia que se movera en el laberinto
 type entity struct {
 	x, y     int
 	memory   []uuid.UUID
@@ -34,6 +35,7 @@ type entity struct {
 	lastMove Direction
 }
 
+// Memoize guarda la posición actual en la memoria
 func (e *entity) Memoize() {
 	uuidString := e.maze.grid[e.x][e.y].uuid.String()
 
@@ -83,7 +85,7 @@ func (e *entity) moveLeft() {
 		return
 	}
 
-	if e.y < len(e.maze.grid[0])-1 && e.maze.grid[e.x][e.y-1].val != solid {
+	if e.y < len(e.maze.grid[0])-1 && e.maze.grid[e.x][e.y-1].val != so {
 		e.y--
 	}
 }
@@ -95,7 +97,7 @@ func (e *entity) moveRight() {
 		return
 	}
 
-	if e.y < len(e.maze.grid[0])-1 && e.maze.grid[e.x][e.y+1].val != solid {
+	if e.y < len(e.maze.grid[0])-1 && e.maze.grid[e.x][e.y+1].val != so {
 		e.y++
 	}
 }
@@ -107,7 +109,7 @@ func (e *entity) moveUp() {
 		return
 	}
 
-	if e.x < len(e.maze.grid)-1 && e.maze.grid[e.x-1][e.y].val != solid {
+	if e.x < len(e.maze.grid)-1 && e.maze.grid[e.x-1][e.y].val != so {
 		e.x--
 	}
 }
@@ -119,13 +121,13 @@ func (e *entity) moveDown() {
 		return
 	}
 
-	if e.x < len(e.maze.grid)-1 && e.maze.grid[e.x+1][e.y].val != solid {
+	if e.x < len(e.maze.grid)-1 && e.maze.grid[e.x+1][e.y].val != so {
 		e.x++
 	}
 }
 
 func (e *entity) isWin() bool {
-	win := e.maze.grid[e.x][e.y].val == exit
+	win := e.maze.grid[e.x][e.y].val == ex
 
 	if win {
 		message := "You win!"
@@ -141,31 +143,31 @@ func (e *entity) isWin() bool {
 func (e *entity) checkWall(maze *Maze) []Direction {
 	list := []Direction{}
 
-	if maze.grid[e.x][e.y+1].val != solid {
+	if maze.grid[e.x][e.y+1].val != so {
 		list = append(list, Down)
 	}
-	if maze.grid[e.x][e.y-1].val != solid {
+	if maze.grid[e.x][e.y-1].val != so {
 		list = append(list, Up)
 	}
-	if maze.grid[e.x+1][e.y].val != solid {
+	if maze.grid[e.x+1][e.y].val != so {
 		list = append(list, Right)
 	}
-	if maze.grid[e.x-1][e.y].val != solid {
+	if maze.grid[e.x-1][e.y].val != so {
 		list = append(list, Left)
 	}
 
-	found := false
+	// found := false
 
-	for _, dir := range list {
-		if e.lastMove == dir {
-			found = true
-			break
-		}
-	}
+	// for _, dir := range list {
+	// 	if e.lastMove == dir {
+	// 		found = true
+	// 		break
+	// 	}
+	// }
 
-	if found {
-		return []Direction{e.lastMove}
-	}
+	// if found {
+	// 	return []Direction{e.lastMove}
+	// }
 
 	return list
 }
@@ -173,9 +175,9 @@ func (e *entity) checkWall(maze *Maze) []Direction {
 type block int
 
 const (
-	empty block = iota
-	solid
-	exit
+	em block = iota
+	so
+	ex
 )
 
 type Direction int
@@ -226,24 +228,36 @@ type Maze struct {
 	grid          [][]Cell
 }
 
-var defaultMaze = [][]block{
-	{solid, solid, solid, solid, solid, solid, solid, solid, solid},
-	{solid, empty, empty, empty, empty, empty, empty, empty, solid},
-	{solid, empty, solid, solid, solid, solid, solid, empty, solid},
-	{solid, empty, solid, empty, empty, empty, solid, empty, solid},
-	{solid, empty, solid, empty, solid, empty, solid, empty, solid},
-	{solid, empty, solid, empty, solid, exit, solid, empty, solid},
-	{solid, empty, solid, empty, solid, solid, solid, empty, solid},
-	{solid, empty, empty, empty, empty, empty, solid, empty, solid},
-	{solid, solid, solid, solid, solid, solid, solid, solid, solid},
+var customMaze = [][]block{
+	{so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so},
+	{so, em, em, so, em, em, em, em, so, em, em, so, so, em, so, so, so, so, so, em, em, em, em, em, so},
+	{so, em, so, so, em, so, so, em, so, em, so, so, so, em, so, em, so, so, em, so, so, so, so, em, so},
+	{so, em, em, em, em, em, so, em, em, em, em, em, em, em, em, em, em, em, em, so, em, em, so, em, so},
+	{so, em, so, em, so, em, so, so, so, so, so, so, so, so, em, so, em, so, so, so, em, so, so, em, so},
+	{so, em, so, em, so, em, so, so, so, so, so, em, em, em, em, so, em, em, em, em, em, em, so, em, so},
+	{so, em, so, em, so, em, em, em, em, em, em, em, so, so, so, so, em, so, so, em, so, em, so, em, so},
+	{so, so, so, so, so, em, so, so, em, so, so, em, so, em, em, so, em, so, em, em, so, em, em, em, so},
+	{so, so, em, em, em, em, so, so, em, so, so, em, so, so, so, so, em, so, em, so, so, so, so, so, so},
+	{so, em, em, so, so, em, em, em, em, em, so, em, so, so, so, so, em, so, em, so, so, so, so, so, so},
+	{so, em, so, so, so, em, so, so, so, em, so, em, em, em, em, so, em, so, em, em, so, so, so, so, so},
+	{so, em, so, so, so, em, em, so, so, em, so, em, so, so, em, so, em, so, so, em, em, so, so, so, so},
+	{so, em, em, em, em, so, em, so, so, em, so, so, so, so, em, so, em, em, em, so, em, so, so, so, so},
+	{so, so, so, em, so, so, em, em, em, em, so, em, em, em, em, so, so, so, em, so, em, so, so, so, so},
+	{so, so, so, em, so, em, em, so, so, so, so, em, so, so, em, so, so, so, em, so, em, so, so, so, so},
+	{so, so, so, em, so, so, em, so, em, so, so, em, so, so, em, so, so, so, em, so, em, so, so, so, so},
+	{so, em, em, em, so, so, em, so, em, em, em, em, so, em, so, so, em, em, em, so, em, so, so, so, so},
+	{so, em, so, em, em, em, em, so, em, so, so, so, so, em, so, so, so, so, so, so, em, so, so, so, so},
+	{so, em, so, so, so, so, so, so, em, so, em, em, em, em, so, em, em, em, em, em, em, so, so, so, so},
+	{so, em, em, em, so, em, em, em, em, so, em, so, so, em, em, ex, so, so, so, so, so, so, so, so, so},
+	{so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so, so},
 }
 
 // NewMaze crea un nuevo objeto Maze con el tamaño especificado.
-func NewMaze() (*Maze, error) {
+func NewMaze(mazeArr [][]block) (*Maze, error) {
 	maze := &Maze{
-		width:  len(defaultMaze[0]),
-		height: len(defaultMaze),
-		grid:   genCells(defaultMaze),
+		width:  len(mazeArr[0]),
+		height: len(mazeArr),
+		grid:   genCells(mazeArr),
 	}
 
 	return maze, nil
@@ -259,19 +273,19 @@ func (m *Maze) Render(e *entity) {
 			char := ' '
 			fg := termbox.ColorDefault
 			bg := termbox.ColorLightGray
-			if cell.val == empty {
+			if cell.val == em {
 				char = ' '
 				fg = termbox.ColorDefault
 				bg = termbox.ColorDefault
 			}
 
-			if cell.val == solid {
+			if cell.val == so {
 				char = 'W'
 				fg = termbox.ColorBlack
 				bg = termbox.ColorYellow
 			}
 
-			if cell.val == exit {
+			if cell.val == ex {
 				char = 'S'
 				fg = termbox.ColorRed
 				bg = termbox.ColorLightGreen
@@ -299,7 +313,7 @@ func main() {
 
 	defer termbox.Close()
 
-	maze, errMaze := NewMaze()
+	maze, errMaze := NewMaze(customMaze)
 
 	if errMaze != nil {
 		fmt.Println(errMaze)
