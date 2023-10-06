@@ -330,6 +330,7 @@ go func() {
 ### Ejecutar el programa
 
 Se deben ejecutar los sigueintes coamndos:
+
 ```bash
 go install # Para instalar las dependencias
 go run main.go # Para ejecutar el programa
